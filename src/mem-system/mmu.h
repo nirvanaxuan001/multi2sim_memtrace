@@ -29,6 +29,14 @@ enum mmu_access_t
 	mmu_access_execute
 };
 
+struct history
+{
+	unsigned int vtl_addr;
+	float wps;
+	float rps;
+	struct history * next;
+};
+typedef struct history* hnode;
 extern char *mmu_report_file_name;
 
 extern unsigned int mmu_page_size;
@@ -45,6 +53,9 @@ int mmu_valid_phy_addr(unsigned int phy_addr);
 
 void mmu_access_page(unsigned int phy_addr, enum mmu_access_t access);
 unsigned int mmu_get_vtl(unsigned int phy_addr);
-
+void history_init(char * history_file_name1,char *history_file_name2);
+void history_init_by_file(struct history ** hastable,char * history_file_name);
+hnode * history_hash_table1;
+hnode * history_hash_table2;
 #endif
 

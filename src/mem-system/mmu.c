@@ -24,7 +24,7 @@
 #include <lib/util/file.h>
 #include <lib/util/list.h>
 #include <lib/util/misc.h>
-
+#include <lib/esim/esim.h>
 #include "mmu.h"
 
 
@@ -79,8 +79,41 @@ struct mmu_t
 
 static struct mmu_t *mmu;
 
+/*new*/
 
-
+/*init history by file*/
+void history_init(char * history_file_name1,char *history_file_name2)
+{
+	history_hash_table1 = (hnode *)xcalloc(1024, sizeof(hnode));
+	history_hash_table2 = (hnode *)xcalloc(1024, sizeof(hnode));
+	history_init_by_file(history_hash_table1,history_file_name1);
+	history_init_by_file(history_hash_table2,history_file_name2);
+}
+void history_init_by_file(hnode *hashtable,char * history_file_name)
+{
+	FILE *f;
+	struct history *page;
+        char line[1024*8];
+	char *line_ptr;
+	int line_num;
+	int index;
+	f= fopen(history_file_name,"rt");
+	if(!f)
+		fatal("%s cannnot open file",history_file_name);
+	line_num=0;
+	while(1)
+	{	
+		page = (struct history *)xcalloc(1, sizeof(struct history));
+		//line_num++;
+		//line_ptr=fgets(line,sizeof(line),f);
+		//puts(line_ptr);
+		if(fscanf(f,"%x %f %f",&(page->vtl_addr),&(page->wps),&(page->rps)) == EOF) break;
+		index = (page->vtl_addr >> 12)% MMU_PAGE_HASH_SIZE;
+		page->next = *(hashtable+index);
+		*(hashtable+index) = page;
+	}
+	fclose(f);
+}
 
 /*
  * Private Functions

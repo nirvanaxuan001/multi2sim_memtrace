@@ -72,6 +72,8 @@
 #include <sys/time.h>
 #include <visual/common/visual.h>
 
+static char *history_file_name1 ="";
+static char *history_file_name2 ="";
 
 static char *visual_file_name = "";
 static char *ctx_config_file_name = "";
@@ -604,7 +606,14 @@ static void m2s_read_command_line(int *argc_ptr, char **argv)
 			fprintf(stderr, "%s", x86_loader_help);
 			continue;
 		}
-
+		/*History File*/
+		if (!strcmp(argv[argi], "--his-config"))
+		{
+			m2s_need_argument(argc, argv, argi);
+			history_file_name1 = argv[++argi];
+			history_file_name2 = argv[++argi];
+			continue;
+		}
 		/* ELF debug file */
 		if (!strcmp(argv[argi], "--elf-debug"))
 		{
@@ -1956,6 +1965,9 @@ int main(int argc, char **argv)
 	/* Southern Islands dump config file */
 	if (*si_gpu_dump_default_config_file_name)
 		si_gpu_dump_default_config(si_gpu_dump_default_config_file_name);
+	/*history*/
+	if(*history_file_name1&&*history_file_name2)
+		history_init(history_file_name1,history_file_name2);
 
 	/* Debug */
 	debug_init();
